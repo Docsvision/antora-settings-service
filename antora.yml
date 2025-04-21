@@ -1,5 +1,5 @@
 name: settings-service
-version: 'NP-1679'
+version: 'dev'
 prerelease: true
 title: Сервис настроек
 asciidoc:
