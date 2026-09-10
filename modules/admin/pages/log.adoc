@@ -2,24 +2,29 @@
 
 Журнал работы модуля в локальной файловой системе располагается в каталоге `/var/log/docsvision\settingsservice` для Linux и `C:\ProgramData\Docsvision\Logs\SettingsService` для Windows.
 
-// include::install-linux:ROOT:appendix/commands.adoc[tags=log]
-
-:module-service: {ws}
+:module-service: {of-sett-serv}
 include::6.1@webclient:admin:partial$excerpts.adoc[tags=no-rights]
 
+Журналирование {of-sett-serv} выполняется с помощью https://nlog-project.org/[NLog], начиная с {sett-serv-log-req}, журнал ведётся в формате JSON.
+
+TIP: Подробнее о работе с журналом формата JSON см. в руководстве по настройке {dv}: "xref:GBL-3610@engineer:ROOT:system-logging.adoc[]".
+
 [subs="specialchars,attributes,quotes"]
-Пути к журналам и уровень журналирования настраиваются в конфигурационном файле по адресу {config-ss}:
+Журналирование с использованием NLog по умолчанию работает, когда в конфигурационном файле {config-ss} указаны настройки NLog. Если настройки в конфигурационном файле не указаны, журналирование будет работать по прежнему принципу.
+
+Пути к журналам, уровень и режим журналирования настраиваются в конфигурационном файле по адресу {config-ss}:
 
 [source,json]
 ----
 {
   "NLog": {
     "targets": {
-      "logFile": {
+      "logFile": { <.>
         "type": "File",
-        "fileName": "${gdc:baseLogFolder}/docsvision/settingsservice/${shortdate}_SettingsService.log", <.>
+        "fileName": "${gdc:baseLogFolder}/docsvision/settingsservice/settingsservice{event-properties:item=Tenant} PID ${processId} ${shortdate}.log", <.>
         "layout": "[${longdate}][${level}][${callsite}] ${message} ${exception:format=tostring,Data}"
-      }
+        "logConsole": { "type": "Console" } <.>
+      },
     },
     "rules": [
       {
@@ -31,9 +36,31 @@ include::6.1@webclient:admin:partial$excerpts.adoc[tags=no-rights]
   }
 }
 ----
-<.> Путь к файлу журнала указан в параметре `fileName`.
-<.> Уровень журналирования по умолчанию -- "Warn".
+<.> `logFile` -- настройки для режима вывода журнала в файл.
+<.> В `fileName` можно настроить путь для сохранения журнала работы. Поддерживаются https://github.com/nlog/NLog/wiki/File-target[допустимые для NLog переменные].
+<.> `logConsole` -- настройки для режима вывода журнала в stdout/stderr процесса, например _journald_ в терминале Linux. Формат -- тот же JSON, что и для файла.
+<.> Измените значение параметров `minLevel` и `maxLevel`, например, на `trace`, чтобы включить протоколирование всех типов событий. +
+Допустимые уровни протоколирования приведены https://github.com/nlog/NLog/wiki/Configuration-file#log-levels[на странице NLog в GitHub]. +
+Для получения дополнительной информации о других настройках NLog обратитесь к документации по данной платформе.
 
-Новый журнал создаётся после истечения заданного интервала времени. Каждый день журнал сохраняется в архив. Максимальное число сохраненных архивов 30.
+[#modes]
+== Режимы журналирования
 
-Дополнительная информация по настройке журналирования приведена https://nlog-project.org[на сайте] компонента NLog.
+Система поддерживает два режима журналирования, каждый режим может быть настроен независимо друг от друга или одновременно.
+
+[cols=",,", options="header"]
+|===
+|Режим |Параметр конфигурации |Переключатель
+|Файл |`logFile` |`enableFileLogging`
+|Консоль (stdout/stderr) |`logConsole`  |`enableConsoleLogging`
+|===
+
+Оба режима ведут журнал в одинаковом JSON-формате и могут быть задействованы одновременно в Windows или Linux.
+// Но не в Docker
+
+[#redefine]
+== Переопределение параметров
+
+Параметры журналирования могут быть переопределены через переменные окружения. Параметры, заданные через переменные окружения преобладают над значениями, указанными в конфигурационном файле.
+
+TIP: Подробнее про переопределение параметров с использованием переменных окружения см. в руководстве по настройке, раздел "xref:GBL-3610@engineer:ROOT:system-logging.adoc#env-vars[Переменные среды для журнала NLog]".
