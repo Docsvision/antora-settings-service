@@ -1,13 +1,14 @@
-= Журнал работы
+:of-what: {of-sett-serv}
+:version: {sett-serv-log-req}
+
+= Журнал работы {of-sett-serv}
 
 Журнал работы модуля в локальной файловой системе располагается в каталоге `/var/log/docsvision\settingsservice` для Linux и `C:\ProgramData\Docsvision\Logs\SettingsService` для Windows.
 
 :module-service: {of-sett-serv}
 include::6.1@webclient:admin:partial$excerpts.adoc[tags=no-rights]
 
-Журналирование {of-sett-serv} выполняется с помощью https://nlog-project.org/[NLog], начиная с {sett-serv-log-req}, журнал ведётся в формате JSON.
-
-TIP: Подробнее о работе с журналом формата JSON см. в руководстве по настройке {dv}: "xref:GBL-3610@engineer:ROOT:system-logging.adoc[]".
+include::GBL-3610@engineer:ROOT:partial$excerpts.adoc[tags=nlog-json]
 
 [subs="specialchars,attributes,quotes"]
 Журналирование с использованием NLog по умолчанию работает, когда в конфигурационном файле {config-ss} указаны настройки NLog. Если настройки в конфигурационном файле не указаны, журналирование будет работать по прежнему принципу.
@@ -43,24 +44,4 @@ TIP: Подробнее о работе с журналом формата JSON 
 Допустимые уровни протоколирования приведены https://github.com/nlog/NLog/wiki/Configuration-file#log-levels[на странице NLog в GitHub]. +
 Для получения дополнительной информации о других настройках NLog обратитесь к документации по данной платформе.
 
-[#modes]
-== Режимы журналирования
-
-Система поддерживает два режима журналирования, каждый режим может быть настроен независимо друг от друга или одновременно.
-
-[cols=",,", options="header"]
-|===
-|Режим |Параметр конфигурации |Переключатель
-|Файл |`logFile` |`enableFileLogging`
-|Консоль (stdout/stderr) |`logConsole`  |`enableConsoleLogging`
-|===
-
-Оба режима ведут журнал в одинаковом JSON-формате и могут быть задействованы одновременно в Windows или Linux.
-// Но не в Docker
-
-[#redefine]
-== Переопределение параметров
-
-Параметры журналирования могут быть переопределены через переменные окружения. Параметры, заданные через переменные окружения преобладают над значениями, указанными в конфигурационном файле.
-
-TIP: Подробнее про переопределение параметров с использованием переменных окружения см. в руководстве по настройке, раздел "xref:GBL-3610@engineer:ROOT:system-logging.adoc#env-vars[Переменные среды для журнала NLog]".
+include::GBL-3610@engineer:ROOT:partial$modes-archivation-redefine.adoc[]
