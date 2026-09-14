@@ -1,9 +1,11 @@
 :of-what: {of-sett-serv}
 :version: {sett-serv-log-req}
+:log-ss: `/var/log/docsvision\settingsservice` для Linux и `C:\ProgramData\Docsvision\SettingsService` для Windows
 
 = Журнал работы {of-sett-serv}
 
-Журнал работы модуля в локальной файловой системе располагается в каталоге `/var/log/docsvision\settingsservice` для Linux и `C:\ProgramData\Docsvision\Logs\SettingsService` для Windows.
+[subs="specialchars,attributes,quotes"]
+Журнал работы модуля в локальной файловой системе располагается в каталоге {log-ss}.
 
 :module-service: {of-sett-serv}
 include::6.1@webclient:admin:partial$excerpts.adoc[tags=no-rights]
@@ -13,12 +15,31 @@ include::GBL-3610@engineer:ROOT:partial$excerpts.adoc[tags=nlog-json]
 [subs="specialchars,attributes,quotes"]
 Журналирование с использованием NLog по умолчанию работает, когда в конфигурационном файле {config-ss} указаны настройки NLog. Если настройки в конфигурационном файле не указаны, журналирование будет работать по прежнему принципу.
 
+Журналирование в формате JSON будет выполняться, если в секции NLog указан параметр `variables`. Если указанный параметр не задан, журналирование будт выполняться в текстовом формате.
+
+[subs="specialchars,attributes,quotes"]
 Пути к журналам, уровень и режим журналирования настраиваются в конфигурационном файле по адресу {config-ss}:
 
 [source,json]
 ----
 {
   "NLog": {
+    "variables": { <.>
+      "fileLogLevel": "Error", <.>
+      "consoleLogLevel": "Error", <.>
+      "enableFileLogging": "true", <.>
+      "enableConsoleLogging": "true", <.>
+      "jsonLayout": { <.>
+        "type": "JsonLayout", <.>
+        "includeAllProperties": true, <.>
+        "attributes": [ <.>
+          {
+          "name": "timestamp", <.>
+          "layout": "${date:format=yyyy-MM-dd HH\\:mm\\:ss.fff}" <.>
+          }
+        ]
+      }
+    },
     "targets": {
       "logFile": { <.>
         "type": "File",
@@ -37,6 +58,12 @@ include::GBL-3610@engineer:ROOT:partial$excerpts.adoc[tags=nlog-json]
   }
 }
 ----
+<.> `variables` -- раздел определяет параметры, которые используются в других частях конфигурации.
+<.> `fileLogLevel` -- задаёт уровень журналирования для файла журнала.
+<.> `consoleLogLevel` -- задаёт уровень журналирования для консоли (stdout/stderr).
+<.> `enableFileLogging` -- включает или отключает ведение журнала в файл.
+<.> `enableConsoleLogging` -- включает или отключает ведение журнала в консоль (stdout/stderr).
+<.> `jsonLayout` -- определяет JSON-структуру сообщений журнала.
 <.> `logFile` -- настройки для режима вывода журнала в файл.
 <.> В `fileName` можно настроить путь для сохранения журнала работы. Поддерживаются https://github.com/nlog/NLog/wiki/File-target[допустимые для NLog переменные].
 <.> `logConsole` -- настройки для режима вывода журнала в stdout/stderr процесса, например _journald_ в терминале Linux. Формат -- тот же JSON, что и для файла.
