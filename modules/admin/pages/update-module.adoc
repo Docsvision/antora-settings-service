@@ -3,10 +3,14 @@
 :lin-service: dvsettings
 :win-service: {wacss-win}
 :nometa:
+:mod-log-req: {sett-serv-log-req}
+:mod: {of-sett-serv}
+:link: settings-service:admin:log
 
 = Обновление модуля
 
-NOTE: В {sett-serv-log-req} {of-sett-serv} изменён механизм журналирования модуля, см. подробнее "xref:settings-service:admin:log.adoc[]". Новый механизм журналирования будет работать, только если перезаписать конфигурационный файл или указать новые настройки.
+
+include::GBL-3610@engineer:ROOT:partial$excerpts.adoc[tags=update-log]
 
 include::webclient:ROOT:partial$excerpts.adoc[tags=what-changed]
 
