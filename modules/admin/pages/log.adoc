@@ -1,6 +1,6 @@
 :of-what: {of-sett-serv}
 :version: {sett-serv-log-req}
-:log-ss: `/var/log/docsvision\settingsservice` для Linux и `C:\ProgramData\Docsvision\SettingsService` для Windows
+:log-ss: `/var/log/docsvision/settingsservice` для Linux и `C:\ProgramData\Docsvision\SettingsService` для Windows
 
 = Журнал работы {of-sett-serv}
 
